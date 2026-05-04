@@ -1,5 +1,7 @@
-# RAG-Youtube-Chatapp - Methodology
+# Rag-Knowledge-base - Methodology
 ![Python](https://img.shields.io/badge/Python-3.14.3-blue) ![FastAPI](https://img.shields.io/badge/FastAPI-Backend-green) ![Next.js](https://img.shields.io/badge/Next.js-Frontend-black) ![Qdrant](https://img.shields.io/badge/Qdrant-VectorDB-red) ![SentenceTransformers](https://img.shields.io/badge/SentenceTransformers-Embeddings-orange) ![Gemini](https://img.shields.io/badge/Gemini-2.5-flash-purple) ![RAG](https://img.shields.io/badge/RAG-Retrieval%20Augmented%20Generation-yellow) ![License](https://img.shields.io/badge/License-MIT-lightgrey) ![Google Deep Translate](https://img.shields.io/badge/Translation-Google%20Deep%20Translate-blue)
+
+![new-feature](apps/web/public/knowledge-base-feature.png)
 
 ## Source Material
 
@@ -129,7 +131,6 @@ This approach ensures that answers are derived from the retrieved content rather
 ![QA2](apps/web/public/qa2.png) 
 ![QA3](apps/web/public/qa3.png) 
 ![QA4](apps/web/public/qa4.png)
-
 ---
 
 ## API Layer
