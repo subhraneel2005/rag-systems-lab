@@ -1,5 +1,5 @@
 {
-  "name": "rag-yt-bot",
+  "name": "usecerebr",
   "private": true,
   "scripts": {
     "build": "turbo run build",

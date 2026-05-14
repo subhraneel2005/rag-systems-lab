@@ -1,9 +1,245 @@
-# Rag-Knowledge-base - Methodology
-![Python](https://img.shields.io/badge/Python-3.14.3-blue) ![FastAPI](https://img.shields.io/badge/FastAPI-Backend-green) ![Next.js](https://img.shields.io/badge/Next.js-Frontend-black) ![Qdrant](https://img.shields.io/badge/Qdrant-VectorDB-red) ![SentenceTransformers](https://img.shields.io/badge/SentenceTransformers-Embeddings-orange) ![Gemini](https://img.shields.io/badge/Gemini-2.5-flash-purple) ![RAG](https://img.shields.io/badge/RAG-Retrieval%20Augmented%20Generation-yellow) ![License](https://img.shields.io/badge/License-MIT-lightgrey) ![Google Deep Translate](https://img.shields.io/badge/Translation-Google%20Deep%20Translate-blue)
+<div align="center">
 
-![new-feature](apps/web/public/knowledge-base-feature.png)
+# usecerebr v2
 
-## Source Material
+### Second Brain for AI Learning
+
+<p align="center">
+A personal knowledge graph/second brain that connects ideas across sources like youtube videos, research papers, blogs and articles, X posts/arcticles. 
+</p>
+
+<br/>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Python-3.14.3-blue?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/FastAPI-Backend-green?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Next.js-Frontend-black?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Qdrant-VectorDB-red?style=for-the-badge" />
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/SentenceTransformers-Embeddings-orange?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/RAG-Retrieval%20Augmented%20Generation-yellow?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/AI-Knowledge%20Graph-8A2BE2?style=for-the-badge" />
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/ReactFlow-Graph%20Visualization-149eca?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Storage-JSON%20Local--First-informational?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/License-MIT-lightgrey?style=for-the-badge" />
+</p>
+
+</div>
+
+---
+
+# 1. Multi-Source Ingestion Pipeline
+
+| Source Type | Ingestion Method |
+|---|---|
+| YouTube (existing) | URL paste → transcript fetch |
+| Research Papers | arXiv API search + manual PDF upload |
+| Web Articles | URL paste → scrape via BeautifulSoup/Playwright |
+| X Posts | Manual URL paste → fetch via Twitter API |
+
+## Metadata Schema (Unified)
+
+```json
+{
+    "source_type": "youtube|paper|article|xpost",
+    "source_id": "video_id|arxiv_id|url|tweet_id",
+    "title": "...",
+    "authors": [...],        # for papers
+    "url": "...",
+    "topics": [...],         # AI-generated tags
+    "ingested_at": "timestamp",
+    # Source-specific fields:
+    "youtube": { "channel": "...", "duration": ... },
+    "paper": { "arxiv_id": "...", "categories": [...] },
+    "article": { "domain": "...", "author": "..." },
+    "xpost": { "username": "...", "likes": ..., "retweets": ... }
+}
+````
+
+## Qdrant Collection Changes
+
+* Rename yt-transcripts → cerebr-knowledge
+* Add topics: ["LLM", "RAG", "Transformers"] field for filtering
+* Add multi-tenant support (user_id) for future sharing
+
+---
+
+# 2. Topic Extraction Service
+
+New backend service that runs after ingestion:
+
+1. Extract 3-5 topics per chunk using LLM or keywords
+2. Store topics in payload for filtering/graph
+3. Re-index existing YouTube chunks with topics (batch job)
+
+---
+
+# 3. Knowledge Graph Visualization
+
+Frontend: React Flow or similar graph library
+
+## Graph Structure
+
+* Nodes: Topics (e.g., "Retrieval-Augmented Generation", "Attention Mechanism")
+* Edges: Connection strength based on co-occurrence in same chunks
+* Node expansion: Click a topic → shows connected sources (video, paper, article, tweet)
+
+## Interactions
+
+* Drag/zoom pan
+* Click node → open chat with that topic as context
+* Click source → preview in sidebar
+* Filter by source type (toggle visibility)
+
+---
+
+# 4. Chat with Sessions
+
+## Backend
+
+* Session table: id, user_id, title, created_at, updated_at
+* Messages table: id, session_id, role, content, tokens_used, sources_retrieved
+* API usage per message: { prompt_tokens, completion_tokens, cost }
+
+## Frontend UI
+
+* Sidebar: List of sessions (sorted by recent)
+* Create new session / rename / delete
+* Session-aware chat (switches context)
+
+---
+
+# 5. Export & Share Chat
+
+## Export formats
+
+* Markdown (with citations)
+* JSON (full metadata)
+* HTML (rendered)
+
+## Share system
+
+* Generate unique shareable link: cerebr.app/s/{share_id}
+* Access levels: view (read-only) | edit (can continue chat)
+* Simple token-based auth (no login for MVP)
+
+---
+
+# 6. Detailed Citations
+
+Each source type shows rich metadata in citations:
+
+| Source  | Citation UI                                             |
+| ------- | ------------------------------------------------------- |
+| YouTube | Video title, channel, timestamp, play button → opens YT |
+| Paper   | Title, authors, arXiv ID, year, link to arXiv           |
+| Article | Title, domain, author, date, link                       |
+| X Post  | Username, date, likes/retweets count, link              |
+
+Clicking citation → opens source or shows in preview panel.
+
+---
+
+# 7. Better Chat UX (Kiboui Components)
+
+Upgrade chat with:
+
+* Message editing (retry)
+* Copy button per message
+* Source citation cards below each AI response
+* Typing indicators
+* Markdown rendering with code syntax highlighting
+* Voice input (optional)
+
+---
+
+# 8. API Usage Dashboard
+
+## Per-session stats
+
+* Total tokens used (prompt + completion)
+* Estimated cost (configurable $ rate per 1M tokens)
+* Graph: tokens over time per session
+* Compare sessions
+
+## Global stats
+
+* Today's / weekly / monthly usage
+* Cost breakdown by source type
+
+---
+
+# Implementation Phases
+
+## Phase 1: Foundation (Weeks 1-2)
+
+* [ ] New Qdrant collection cerebr-knowledge with topic field
+* [ ] Topic extraction service (LLM-based)
+* [ ] Refactor ingestion to support pluggable sources
+* [ ] Add arXiv API + PDF upload
+* [ ] Add web article scraping
+
+## Phase 2: X Posts + Graph (Weeks 3-4)
+
+* [ ] X post ingestion (manual URL paste)
+* [ ] Re-index existing YouTube with topics
+* [ ] Graph visualization component
+* [ ] Topic-based filtering in retrieval
+
+## Phase 3: Chat Sessions + Sharing (Weeks 5-6)
+
+* [ ] Session management (create, rename, delete)
+* [ ] Message history with source tracking
+* [ ] Export chat (MD, JSON, HTML)
+* [ ] Share links with view/edit access
+
+## Phase 4: Usage + Polish (Weeks 7-8)
+
+* [ ] API usage logging per message
+* [ ] Usage dashboard UI
+* [ ] Citation component improvements
+* [ ] Kiboui chat components
+* [ ] UI/UX polish
+
+---
+
+# Tech Additions
+
+| New Dependency              | Purpose                     |
+| --------------------------- | --------------------------- |
+| beautifulsoup4 / playwright | Web scraping                |
+| arxiv (PyPI)                | arXiv API                   |
+| pypdf / pdfplumber          | PDF text extraction         |
+| tweepy / snscrape           | X post fetching             |
+| react-flow                  | Graph visualization         |
+| recharts                    | Usage charts                |
+| PostgreSQL (optional)       | Session/message persistence |
+
+---
+
+## Files to Modify / Add
+
+* `apps/rag-pipeline/api/routes/ingest.py` — new unified ingestion endpoint
+* `apps/rag-pipeline/api/routes/sessions.py` — session CRUD
+* `apps/rag-pipeline/api/routes/share.py` — share links
+* `apps/rag-pipeline/api/routes/usage.py` — usage stats
+* `apps/rag-pipeline/actions/topic_extractor.py` — new
+* `apps/rag-pipeline/actions/sources/` — source-specific handlers
+* `apps/web/app/knowledge-graph/` — new page
+* `apps/web/app/sessions/` — session management
+* `apps/web/app/usage/` — usage dashboard
+* `apps/web/components/chat/` — upgraded chat UI
+* `packages/ui/graph.tsx` — reusable graph component
+
+
+# Current v1 of usecerebr
+
+## Knowledge base
 
 The dataset for this project consisted of four YouTube videos provided in the assignment, covering machine learning, neural networks, and transformers. Two videos were in English and two in Hindi.
 
